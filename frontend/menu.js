@@ -223,7 +223,7 @@
           var h3 = document.createElement('h3');
           h3.textContent = 'Uploads';
           var closeBtn = document.createElement('button');
-          closeBtn.className = 'btn btn--sm';
+          closeBtn.className = 'btn btn--sm btn--secondary';
           closeBtn.textContent = 'Close';
           closeBtn.onclick = function(){ dlg.remove(); };
           hdr.appendChild(h3);
@@ -264,7 +264,7 @@
         var h3 = document.createElement('h3');
         h3.textContent = 'QR Code';
         var closeBtn = document.createElement('button');
-        closeBtn.className = 'btn btn--sm';
+        closeBtn.className = 'btn btn--sm btn--secondary';
         closeBtn.textContent = 'Close';
         closeBtn.onclick = function(){ dlg.remove(); };
         hdr.appendChild(h3);
