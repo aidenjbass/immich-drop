@@ -134,11 +134,11 @@
     var inactive = String(row.inactiveReason||'');
     if (/expired|claimed|exhausted/i.test(inactive)){
       var label = inactive.charAt(0).toUpperCase()+inactive.slice(1);
-      return '<span class="badge badge--red">'+escAttr(label)+'</span>';
+      return '<span class="status-dot status-dot--red" title="'+escAttr(label)+'" aria-label="'+escAttr(label)+'"></span>';
     }
-    if (row.active) return '<span class="badge badge--green">Active</span>';
-    if (/disabled/i.test(inactive)) return '<span class="badge badge--amber">Disabled</span>';
-    return '<span class="badge">'+(row.active?'Active':'Inactive')+'</span>';
+    if (row.active) return '<span class="status-dot status-dot--green" title="Active" aria-label="Active"></span>';
+    if (/disabled/i.test(inactive)) return '<span class="status-dot status-dot--amber" title="Disabled" aria-label="Disabled"></span>';
+    return '<span class="status-dot status-dot--neutral" title="Inactive" aria-label="Inactive"></span>';
   }
 
   function renderInvites(){
