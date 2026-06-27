@@ -273,11 +273,12 @@
         var body = document.createElement('div');
         body.className = 'flex items-center';
         body.style.gap = '16px';
+        body.style.justifyContent = 'center';
         var img = document.createElement('img');
         img.src = '/api/qr?text='+encodeURIComponent(url);
         img.alt = 'QR';
-        img.style.width = '140px';
-        img.style.height = '140px';
+        img.style.width = '256px';
+        img.style.height = '256px';
         body.appendChild(img);
         panel.appendChild(body);
         dlg.appendChild(panel);
