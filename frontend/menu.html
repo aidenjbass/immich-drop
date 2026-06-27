@@ -38,7 +38,7 @@
           <div id="albumSelectWrap" class="hidden"><select id="albumSelect" class="input"></select></div>
           <div id="albumInputWrap" class="hidden">
             <input id="albumInput" placeholder="Album name (leave blank for none)" class="input" />
-            <button id="btnCreateAlbum" class="btn mt-2">Create album</button>
+            <div class="mt-2"><button id="btnCreateAlbum" class="btn btn--primary">Create album</button></div>
           </div>
           <div id="albumHint" class="form-hint"></div>
         </div>
@@ -48,7 +48,7 @@
         <div><label class="form-label">Expires in days</label><input id="days" type="number" min="0" placeholder="No expiry" class="input" /></div>
         <div><label class="form-label">Password (optional)</label><input id="password" type="password" placeholder="Set a password" class="input" autocomplete="off" /><div class="form-hint">Recipients must enter this before uploading.</div></div>
       </div>
-      <div class="mt-3"><button id="btnCreate" class="btn btn--primary">Create link</button></div>
+      <div class="mt-2"><button id="btnCreate" class="btn btn--primary">Create link</button></div>
       <div id="result" class="hidden mt-3">
         <div id="linkRow" class="flex gap-2" style="flex-wrap:wrap;"><input id="linkOut" class="input flex-1" readonly /><button id="btnCopy" type="button" class="btn">Copy</button></div>
         <div class="mt-2"><img id="qrImg" alt="QR" style="width:140px;height:140px;" /></div>
@@ -62,7 +62,7 @@
         <div class="flex gap-2 flex-wrap items-center">
           <input id="searchQ" placeholder="Search..." class="input" style="width:140px;" />
           <select id="sortSel" class="input" style="width:130px;"><option value="-created">Newest</option><option value="created">Oldest</option><option value="-expires">Expiry desc</option><option value="expires">Expiry asc</option><option value="name">Name A-Z</option><option value="-name">Name Z-A</option></select>
-          <button id="btnRefresh" class="btn btn--sm">Refresh</button>
+          <button id="btnRefresh" class="btn btn--secondary btn--sm">Refresh</button>
         </div>
       </div>
       <div style="overflow-x:auto;">
@@ -80,7 +80,7 @@
 
     <!-- Platform Cookies -->
     <section class="card">
-      <div class="card-header"><h2>Platform Cookies</h2><button id="btnRefreshCookies" class="btn btn--sm">Refresh</button></div>
+      <div class="card-header"><h2>Platform Cookies</h2><button id="btnRefreshCookies" class="btn btn--secondary btn--sm">Refresh</button></div>
       <p class="text-sm text-secondary mb-3">Add cookies for authenticated social media downloads. Paste the raw cookie header from your browser DevTools (Network tab).</p>
       <div class="form-row" style="grid-template-columns:160px 1fr auto;align-items:end;">
         <div><label class="form-label">Platform</label><select id="cookiePlatform" class="input"><option value="">Select...</option></select></div>
@@ -96,7 +96,7 @@
       </div>
     </section>
 
-    <div class="text-xs text-tertiary" style="margin-bottom:12px;">If album listing or creation is forbidden by your token, specify a fixed album in the .env file as IMMICH_ALBUM_NAME.</div>
+    <div class="text-xs text-tertiary" style="margin-bottom:12px;text-align:center;">If album listing or creation is forbidden by your token, specify a fixed album in the .env file as IMMICH_ALBUM_NAME.</div>
     <footer class="site-footer"><a id="version-link" href="https://github.com/ttlequals0/immich-drop" target="_blank" rel="noopener">immich-drop</a></footer>
   </div>
 

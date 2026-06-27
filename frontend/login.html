@@ -7,12 +7,11 @@
   <link rel="icon" type="image/png" href="/static/favicon.png" />
   <link rel="stylesheet" href="/static/styles.css" />
 </head>
-<body>
-  <div class="page-wrap" style="max-width:440px;">
-    <div id="topBanner" class="banner hidden"></div>
+<body class="login-page">
+  <div class="login-shell">
 
     <header class="site-header">
-      <h1>Login</h1>
+      <h1>Immich Drop</h1>
       <div class="header-actions">
         <a id="linkPublicUploader" href="/" class="btn hidden">Public uploader</a>
         <button id="btnTheme" class="btn btn--icon" title="Toggle dark mode" aria-label="Toggle theme">
@@ -28,8 +27,13 @@
       </div>
     </header>
 
-    <div class="card">
-      <h2 style="font-size:1rem;font-weight:600;margin-bottom:16px;">Sign in to your Immich account</h2>
+    <div id="topBanner" class="banner hidden mb-3"></div>
+
+    <div class="card login-card">
+      <div class="login-brand login-brand--stack">
+        <img src="/static/favicon.png" alt="Immich Drop logo" class="login-logo" />
+      </div>
+      <h1>Login with Immich</h1>
       <div id="msg" class="banner hidden mb-3"></div>
       <form id="loginForm" autocomplete="on">
         <div class="form-group">
@@ -40,14 +44,16 @@
           <label class="form-label" for="password">Password</label>
           <input id="password" type="password" required class="input" autocomplete="current-password" />
         </div>
-        <div class="flex items-center justify-between gap-2 mt-4">
-          <button class="btn btn--primary" type="submit">Login</button>
-          <a href="/" class="btn">Back to uploader</a>
+        <div class="login-actions">
+          <button class="btn btn--primary btn--full" type="submit">Login</button>
+        </div>
+        <div class="login-secondary">
+          <a href="/" class="btn btn--secondary btn--full">Back to uploader</a>
         </div>
       </form>
     </div>
 
-    <footer class="site-footer">
+    <footer class="site-footer login-footer">
       <a id="version-link" href="https://github.com/ttlequals0/immich-drop" target="_blank" rel="noopener">immich-drop</a>
     </footer>
   </div>
