@@ -278,12 +278,7 @@
         img.alt = 'QR';
         img.style.width = '140px';
         img.style.height = '140px';
-        var linkEl = document.createElement('div');
-        linkEl.className = 'text-sm';
-        linkEl.style.wordBreak = 'break-all';
-        linkEl.textContent = url;
         body.appendChild(img);
-        body.appendChild(linkEl);
         panel.appendChild(body);
         dlg.appendChild(panel);
         document.body.appendChild(dlg);
