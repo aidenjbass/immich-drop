@@ -357,22 +357,24 @@ function showBanner(text, kind='ok'){
 
 // --- Connection test with ephemeral banner ---
 if (btnPing) btnPing.onclick = async () => {
-  pingStatus.textContent = 'checking…';
   try{
     const r = await fetch('/api/ping', { method:'POST' });
     const j = await r.json();
-    pingStatus.textContent = j.ok ? 'Connected' : 'No connection';
-    pingStatus.className = 'ml-2 text-sm ' + (j.ok ? 'text-green-600' : 'text-red-600');
-    if(j.ok){
-      let bannerText = `Connected to Immich at ${j.base_url}`;
-      if(j.album_name) {
-        bannerText += ` | Uploading to album: "${j.album_name}"`;
-      }
-      showBanner(bannerText, 'ok');
+    if (pingStatus) {
+      pingStatus.className = 'ml-2 text-sm ' + (j.ok ? 'text-green-600' : 'text-red-600');
     }
-  }catch{
-    pingStatus.textContent = 'No connection';
-    pingStatus.className='ml-2 text-sm text-red-600';
+    if (j.ok) {
+      let bannerText = `Connected to Immich at ${j.base_url}`;
+      if (j.album_name) bannerText += ` | Uploading to album: "${j.album_name}"`;
+      showBanner(bannerText, 'ok');
+    } else {
+      showBanner('No connection to Immich', 'err');
+    }
+  } catch {
+    if (pingStatus) {
+      pingStatus.className = 'ml-2 text-sm text-red-600';
+    }
+    showBanner('No connection to Immich', 'err');
   }
 };
 
