@@ -159,7 +159,7 @@
         + '<td data-label="Expires"><input class="inExpires input" type="date" data-token="'+escAttr(row.token)+'" value="'+escAttr(expVal)+'" title="'+escAttr(expTitle)+'" style="width:140px;"/></td>'
         + '<td data-label="Album">'+escAttr(row.albumName||'--')+'</td>'
         + '<td class="td-actions" data-label="">'
-        + '<div class="flex items-center gap-2">'
+        + '<div class="flex items-center">'
         + '<button class="btnDetails btn btn--sm btn--icon has-tooltip" data-token="'+escAttr(row.token)+'" aria-label="Details"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"><g fill="currentColor"><path d="M11 10.98a1 1 0 1 1 2 0v6a1 1 0 1 1-2 0zm1-4.929a1 1 0 1 0 0 2a1 1 0 0 0 0-2"></path><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10s10-4.477 10-10S17.523 2 12 2M4 12a8 8 0 1 0 16 0a8 8 0 0 0-16 0" clip-rule="evenodd"></path></g></svg><span class="tooltip">Details</span></button>'
         + '<button class="btnQR btn btn--sm btn--icon has-tooltip" data-url="'+escAttr(url)+'" aria-label="QR"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm12 0h-2v2h2v2h-4v2h6v-6h-2v0zm-4-2h2v2h-2v-2zm6-2h2v2h-2v-2z"/></svg><span class="tooltip">QR</span></button>'
         + '<a class="btn btn--sm btn--icon has-tooltip" target="_blank" href="'+escAttr(url)+'" aria-label="Open"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M14 3h7v7h-2V6.414l-9.293 9.293-1.414-1.414L17.586 5H14V3z"/><path d="M5 5h6v2H7v10h10v-4h2v6H5V5z"/></svg><span class="tooltip">Open</span></a>'

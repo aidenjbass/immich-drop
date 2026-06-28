@@ -366,7 +366,7 @@ textarea.input { resize: vertical; font-family: var(--font-mono); font-size: 0.8
   .data-table--responsive td.td-actions {
     margin-top: 6px;
   }
-  .data-table--responsive td.td-actions .flex.items-center.gap-2 {
+  .data-table--responsive td.td-actions .flex.items-center {
     justify-content: center;
     width: 100%;
     flex-wrap: wrap;
