@@ -117,8 +117,6 @@
           pwGate.classList.remove('hidden');
           dz.style.opacity = '0.5';
           if (fi) fi.disabled = true;
-          itemsEl.textContent = 'Enter the password above to enable uploads.';
-          itemsEl.className = 'text-sm text-secondary';
           var pwInput = document.getElementById('pwInput');
           var btnPw = document.getElementById('btnPw');
           var pwError = document.getElementById('pwError');
@@ -133,8 +131,6 @@
               pwGate.classList.add('hidden');
               dz.style.opacity = '1';
               if (fi) fi.disabled = false;
-              itemsEl.textContent = '';
-              itemsEl.className = 'space-y-sm';
               try { window.__header.showBanner('Password accepted. You can upload now.', 'ok'); } catch(e2){}
             } catch (e) {
               pwError.textContent = 'Error verifying password.';
@@ -147,8 +143,6 @@
         if (!j.active) {
           dz.style.opacity = '0.5';
           fi.disabled = true;
-          itemsEl.textContent = 'This link is not active'+(j.inactiveReason?' ('+j.inactiveReason+')':'')+'.';
-          itemsEl.className = 'text-sm text-secondary';
         }
       } catch(e){}
     })();
