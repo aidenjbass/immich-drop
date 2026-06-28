@@ -53,7 +53,6 @@
         }
         if(j.ok){
           let text = `Connected to Immich at ${j.base_url}`;
-          if (j.album_name) text += ` | Uploading to album: "${j.album_name}"`;
           showBanner(text, 'ok');
         } else {
           showBanner('No connection to Immich', 'err');

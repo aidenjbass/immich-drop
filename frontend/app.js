@@ -365,7 +365,6 @@ if (btnPing) btnPing.onclick = async () => {
     }
     if (j.ok) {
       let bannerText = `Connected to Immich at ${j.base_url}`;
-      if (j.album_name) bannerText += ` | Uploading to album: "${j.album_name}"`;
       showBanner(bannerText, 'ok');
     } else {
       showBanner('No connection to Immich', 'err');
@@ -386,7 +385,6 @@ if (btnPing) btnPing.onclick = async () => {
     if (!r.ok) return;
     const j = await r.json();
     const parts = [];
-    if (j.albumName) parts.push(`Uploading to album: "${j.albumName}"`);
     if (j.expiresAt) parts.push(`Expires: ${new Date(j.expiresAt).toLocaleString()}`);
     if (typeof j.remaining === 'number') parts.push(`Uses left: ${j.remaining}`);
     if (parts.length) showBanner(parts.join(' | '), 'ok');
