@@ -46,9 +46,9 @@
         <div class="login-actions">
           <button class="btn btn--primary btn--full" type="submit">Login</button>
         </div>
-        <div class="login-secondary">
-          <a href="/" class="btn btn--secondary btn--full">Back to uploader</a>
-        </div>
+        <!-- <div class="login-secondary">
+          <a id="backToUploader" href="/" class="btn btn--secondary btn--full hidden">Back to uploader</a>
+        </div> -->
       </form>
     </div>
 
@@ -84,6 +84,10 @@
         if (versionEl && data.version) {
           versionEl.textContent = 'immich-drop v' + data.version;
         }
+        // const backToUploader = document.getElementById('backToUploader');
+        // if (backToUploader && data.public_upload_page_enabled) {
+        //   backToUploader.classList.remove('hidden');
+        // }
       })
       .catch(() => {});
   </script>
