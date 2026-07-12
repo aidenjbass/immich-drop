@@ -42,30 +42,50 @@ let items = [];
 let socket;
 
 // Status precedence: never regress (e.g., uploading -> done shouldn't go back to uploading)
-const STATUS_ORDER = { queued: 0, checking: 1, uploading: 2, duplicate: 3, done: 3, error: 4 };
+// 'sending' is the browser->server transfer; 'checking'/'uploading' arrive via WS from the server.
+const STATUS_ORDER = { queued: 0, sending: 1, checking: 2, uploading: 3, duplicate: 4, done: 4, error: 5 };
 const FINAL_STATES = new Set(['done','duplicate','error']);
 
 // --- Dark mode ---
-function initDarkMode() {
-  const stored = localStorage.getItem('theme');
-  if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-    document.documentElement.classList.add('dark');
-  }
+const doc = document;
+const root = document.documentElement;
+let themeMode = 'system';
+const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+
+function applyTheme(mode){
+  const useDark = mode === 'dark' || (mode === 'system' && prefersDark && prefersDark.matches);
+  root.classList.toggle('dark', useDark);
+  root.dataset.theme = mode;
+}
+
+function updateThemeIcon(){
+  const light = doc.getElementById('iconLight');
+  const dark = doc.getElementById('iconDark');
+  const system = doc.getElementById('iconSystem');
+  if (light) light.classList.toggle('hidden', themeMode !== 'light');
+  if (dark) dark.classList.toggle('hidden', themeMode !== 'dark');
+  if (system) system.classList.toggle('hidden', themeMode !== 'system');
+}
+
+function initDarkMode(){
+  try{
+    const saved = localStorage.getItem('immich_drop_theme');
+    themeMode = (saved === 'light' || saved === 'dark') ? saved : 'system';
+  }catch{ themeMode = 'system'; }
+  applyTheme(themeMode);
   updateThemeIcon();
+  if (prefersDark && prefersDark.addEventListener) {
+    prefersDark.addEventListener('change', () => {
+      if (themeMode === 'system') applyTheme('system');
+    });
+  }
 }
 
 function toggleDarkMode() {
-  const isDark = document.documentElement.classList.toggle('dark');
-  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  themeMode = (themeMode === 'dark') ? 'system' : (themeMode === 'system') ? 'light' : 'dark';
+  try{ localStorage.setItem('immich_drop_theme', themeMode); }catch{}
+  applyTheme(themeMode);
   updateThemeIcon();
-}
-
-function updateThemeIcon() {
-  const isDark = document.documentElement.classList.contains('dark');
-  const light = document.getElementById('iconLight');
-  const dark = document.getElementById('iconDark');
-  if (light && light.classList) light.classList.toggle('hidden', !isDark);
-  if (dark && dark.classList) dark.classList.toggle('hidden', isDark);
 }
 
 initDarkMode();
@@ -110,7 +130,9 @@ function render(){
     var fillClass = it.status==='done'?'upload-item__fill--done':it.status==='duplicate'?'upload-item__fill--dup':it.status==='error'?'upload-item__fill--err':'';
     var displayStatus = (it.status==='uploading' && it.progress >= 100) ? 'done' : it.status;
     var pct = Math.max(it.progress, (it.status==='done'||it.status==='duplicate'||it.status==='error')?100:it.progress);
-    var statusText = it.status==='uploading' ? (it.progress >= 100 ? 'Processing...' : 'Uploading... '+it.progress+'%') : it.status.charAt(0).toUpperCase()+it.status.slice(1);
+    var statusText = it.status==='uploading' ? (it.progress >= 100 ? 'Processing...' : 'Uploading... '+it.progress+'%')
+      : it.status==='sending' ? (it.progress >= 100 ? 'Waiting for server...' : 'Sending to server... '+it.progress+'%')
+      : it.status.charAt(0).toUpperCase()+it.status.slice(1);
 
     var card = document.createElement('div');
     card.className = 'upload-item';
@@ -150,27 +172,10 @@ function render(){
     itemsEl.appendChild(card);
   });
 
-  // Attach retry handlers for errored items
-  try {
-    itemsEl.querySelectorAll('.btnRetry').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const id = btn.getAttribute('data-id');
-        const it = items.find(x => x.id === id);
-        if (!it) return;
-        it.status = 'queued';
-        it.progress = 0;
-        try { delete it.message; } catch {}
-        render();
-        runQueue();
-      });
-    });
-  } catch {}
-
   const c = {queued:0,uploading:0,done:0,dup:0,err:0};
   for(const it of items){
     if(['queued','checking'].includes(it.status)) c.queued++;
-    if(it.status==='uploading') c.uploading++;
+    if(it.status==='uploading' || it.status==='sending') c.uploading++;
     if(it.status==='done') c.done++;
     if(it.status==='duplicate') c.dup++;
     if(it.status==='error') c.err++;
@@ -199,11 +204,13 @@ function openSocket(){
     if (inc < cur) {
       // ignore regressive status updates
     } else {
+      const phaseChanged = inc > cur;
       it.status = status;
-    }
-    if (typeof progress==='number') {
-      // never decrease progress
-      it.progress = Math.max(it.progress || 0, progress);
+      if (typeof progress==='number') {
+        // never decrease progress within a phase, but let a new phase
+        // (sending -> checking -> uploading) restart its own bar
+        it.progress = phaseChanged ? progress : Math.max(it.progress || 0, progress);
+      }
     }
     if (message) it.message = message;
     if (FINAL_STATES.has(it.status)) {
@@ -222,7 +229,8 @@ async function runQueue(){
     if(inflight >= 3) return; // client-side throttle; server handles uploads regardless
     const next = items.find(i => i.status==='queued');
     if(!next) return;
-    next.status='checking';
+    next.status='sending';
+    next.progress=0;
     render();
     inflight++;
     try{
@@ -243,6 +251,24 @@ async function runQueue(){
   for(let i=0;i<3;i++) runNext();
 }
 
+// POST a FormData via XHR so the browser->server transfer reports progress
+// (fetch has no upload-progress API).
+function postForm(url, form, onProgress){
+  return new Promise(function(resolve, reject){
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', url);
+    xhr.responseType = 'json';
+    if (xhr.upload && onProgress) {
+      xhr.upload.onprogress = function(e){
+        if (e.lengthComputable) onProgress(Math.round(e.loaded * 100 / e.total));
+      };
+    }
+    xhr.onload = function(){ resolve({ ok: xhr.status >= 200 && xhr.status < 300, body: xhr.response || {} }); };
+    xhr.onerror = function(){ reject(new Error('Network error')); };
+    xhr.send(form);
+  });
+}
+
 async function uploadWhole(next){
   const form = new FormData();
   form.append('file', next.file);
@@ -251,8 +277,19 @@ async function uploadWhole(next){
   form.append('last_modified', next.file.lastModified || '');
   if (INVITE_TOKEN) form.append('invite_token', INVITE_TOKEN);
   form.append('fingerprint', FINGERPRINT);
-  const res = await fetch('/api/upload', { method:'POST', body: form });
-  const body = await res.json().catch(()=>({}));
+  let lastPct = -1;
+  const res = await postForm('/api/upload', form, function(pct){
+    if (pct === lastPct) return;
+    lastPct = pct;
+    // only drive the bar while still in the sending phase; once WS
+    // updates arrive (checking/uploading) they own the item
+    if ((STATUS_ORDER[next.status] ?? 0) <= STATUS_ORDER.sending) {
+      next.status = 'sending';
+      next.progress = pct;
+      render();
+    }
+  });
+  const body = res.body || {};
   if(!res.ok && next.status!=='error'){
     next.status='error';
     next.message = body.error || 'Upload failed';

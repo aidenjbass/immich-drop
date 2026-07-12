@@ -70,13 +70,16 @@
     var albumId = null, albumName = null;
     if (!albumSelectWrap.classList.contains('hidden') && albumSelect.value) {
       albumId = albumSelect.value;
+      var selectedOption = albumSelect.options[albumSelect.selectedIndex];
+      albumName = selectedOption ? selectedOption.text : null;
     } else if (albumInput.value.trim()) {
       albumName = albumInput.value.trim();
     }
     var payload = { maxUses: parseInt(usage.value, 10) };
     var d = days.value.trim();
     if (d) payload.expiresDays = parseInt(d, 10);
-    if (albumId) payload.albumId = albumId; else if (albumName) payload.albumName = albumName;
+    if (albumName) { payload.albumName = albumName; }
+    if (albumId) { payload.albumId = albumId; }
     var pw = (passwordInput && passwordInput.value) ? passwordInput.value.trim() : '';
     if (pw) payload.password = pw;
     try{
@@ -89,6 +92,8 @@
       qrImg.src = '/api/qr?text='+encodeURIComponent(link);
       if (j && j.token) { try { LAST_CREATED_TOKEN = j.token; } catch(e2){} }
       try { await loadInvites(); } catch(e2){}
+      days.value = '';
+      passwordInput.value = '';
     }catch(err){ showResult('err'); }
   };
 
@@ -139,6 +144,16 @@
     if (row.active) return '<span class="status-dot status-dot--green" title="Active" aria-label="Active"></span>';
     if (/disabled/i.test(inactive)) return '<span class="status-dot status-dot--amber" title="Disabled" aria-label="Disabled"></span>';
     return '<span class="status-dot status-dot--neutral" title="Inactive" aria-label="Inactive"></span>';
+  }
+
+  // Invite uploader size formatter (bytes to human-readable)
+  function formatBytes(bytes) {
+    const b = Number(bytes || 0);
+    if (!b) return "0 B";
+    const units = ["B", "KB", "MB", "GB", "TB"];
+    const i = Math.floor(Math.log(b) / Math.log(1024));
+    const value = b / Math.pow(1024, i);
+    return `${value.toFixed(value >= 10 || i === 0 ? 0 : 1)} ${units[i]}`;
   }
 
   function renderInvites(){
@@ -235,7 +250,7 @@
           if (items.length){
             var tbl = '<table class="data-table"><thead><tr><th>When</th><th>IP</th><th>Filename</th><th>Size</th></tr></thead><tbody>';
             items.forEach(function(it){
-              tbl += '<tr><td>'+escAttr(new Date(it.uploadedAt).toLocaleString())+'</td><td>'+escAttr(it.ip)+'</td><td>'+escAttr(it.filename)+'</td><td>'+escAttr((it.size||0).toLocaleString())+'</td></tr>';
+              tbl += '<tr><td>'+escAttr(new Date(it.uploadedAt).toLocaleString())+'</td><td>'+escAttr(it.ip)+'</td><td>'+escAttr(it.filename)+'</td><td>'+escAttr(formatBytes(it.size||0))+'</td></tr>';
             });
             tbl += '</tbody></table>';
             body.innerHTML = tbl;
